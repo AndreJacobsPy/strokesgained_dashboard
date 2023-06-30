@@ -1,0 +1,1 @@
+URL = "postgresql://postgres:annette@localhost:5432/pgatourbeta"
