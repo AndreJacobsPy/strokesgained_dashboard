@@ -1,27 +1,33 @@
 import streamlit as st
 import sqlalchemy as pgsql
 import pandas as pd
+import plotly.express as px
 
 from hidden import URL
-
-@st.cache_data
-def query():
-    # connect database
-    with pgsql.create_engine(URL).connect() as db:
-        query = pgsql.text('select * from strokesgained limit 5')
-        data = db.execute(query)
-        df = pd.DataFrame(data)
-
-        return df
+from data_view import get_data, display_data
 
 
 def app() -> None:
     st.title('Us Open Dashboard')
-
-    st.markdown('## My Data')
-    st.dataframe(query())
+    st.markdown('This is a dashboard to analyze the US Open 2021 data.')
     
+    my_tabs = st.tabs(['Data View'])
 
+    # Data View
+    with my_tabs[0]:
+        st.header('Data View')
+        st.markdown('This is a view of the data.')
+        
+        # Get data from the database
+        # add a selectbox to select which table to view
+        table_name = st.selectbox('Select a table', ['strokesgained', 'players', 'rounds', 'tournaments'])
+        if table_name == None:
+            table_name = 'strokesgained'
+
+        df = get_data(table_name)
+        
+        # Display the data
+        display_data(df)
 
 
 if __name__ == "__main__":
