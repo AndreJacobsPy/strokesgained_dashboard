@@ -8,7 +8,10 @@ def app() -> None:
     st.markdown('# US Open 2023 Dashboard')
 
     db = pgsql.create_engine(URL)
-    data = db.execute("select * from strokesgained limit 5")
+
+    with db.connect() as conn:
+        data = conn.execute("select * from strokesgained limit 5")
+        st.dataframe(data)
 
 
 if __name__ == "__main__":
