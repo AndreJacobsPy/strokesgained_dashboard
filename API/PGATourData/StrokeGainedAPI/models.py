@@ -148,7 +148,7 @@ class Strokesgained(models.Model):
     tournament = models.ForeignKey('Tournaments', models.DO_NOTHING, blank=True, null=True)
     round = models.ForeignKey(Rounds, models.DO_NOTHING, blank=True, null=True)
     total = models.IntegerField(blank=True, null=True)
-    round_0 = models.IntegerField(db_column='round', blank=True, null=True)  # Field renamed because of name conflict.
+    round_score = models.IntegerField(db_column='round', blank=True, null=True)  # Field renamed because of name conflict.
     sg_putt = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
     sg_arg = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
     sg_app = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
