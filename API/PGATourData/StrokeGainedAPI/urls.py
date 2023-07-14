@@ -9,5 +9,6 @@ urlpatterns = [
     path('strokesgained-api/', views.get_strokesgained),
     path('rounds-api/', views.get_rounds),
     path('players-detail-api/<str:name>/', views.get_players_detail),
-    path('tournaments-detail-api/<str:name>/', views.get_tournaments_detail),
+    path('strokesgained-detail-api/<str:name>/', views.get_tournaments_detail),
+    path('strokesgained-detail-api/', views.get_tournaments_detail),
 ]

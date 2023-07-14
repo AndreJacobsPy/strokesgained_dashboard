@@ -1,11 +1,14 @@
 import streamlit as st
 import sqlalchemy as pgsql
-import pandas as pd
+import numpy as np
+import polars as pl
 import plotly.express as px
+import requests
+import json
 
 from hidden import URL
-from data_view import get_data, display_data
-from player_view import backend_players, player_vs_field_barplot, player_stats_histogram
+from data_view import get_data_api, display_data
+from player_view import polars_barchart_pre, bar_chart
 
 
 def app() -> None:
@@ -25,7 +28,7 @@ def app() -> None:
         if table_name == None:
             table_name = 'strokesgained'
 
-        df = get_data(table_name)
+        df = get_data_api(table_name)
         
         # Display the data
         display_data(df)
@@ -43,36 +46,41 @@ def app() -> None:
 
         # first column
         with col1:
-            # get data first
-            query = '''
-                select p.name, sg.total, sg.round, sg_total, sg_app, sg_arg, sg_ott, sg_putt
-                from players as p
-                inner join strokesgained as sg
-                using (player_id);
-            '''
-            df = backend_players(query)
+            # get data from the database
+            req = requests.get('http://localhost:8000/api/strokesgained-detail-api/')
+            raw_data = json.loads(req.text)
+            df = pl.DataFrame(raw_data)
 
             # create pretty graph
-            player = st.selectbox('Select a player', df['name'].unique())
+            @st.cache_data
+            def get_players() -> np.array:
+                players = (df
+                        .select('name')
+                        .unique()
+                        .to_numpy().reshape(1, -1)[0])
+                return players
+            
+            player_list = get_players()
+            
+            player = st.selectbox('Select a player', player_list, key='players_list')
             column = st.selectbox(
                 'Select a column', ['sg_total', 'sg_ott', 'sg_app', 'sg_arg', 'sg_putt', 'round', 'total'],
                 key='player_comparison')
-            fig = player_vs_field_barplot(df, player, column)
+            # fig = player_vs_field_barplot(df.to_pandas(), player, column)
+            # st.plotly_chart(fig, use_container_width=True)
+            
+            # preprocesing for chart
+            grouped, field = polars_barchart_pre(df.to_pandas(), player, column)
+            st.markdown(unsafe_allow_html=True, body='<br>')
+            st.table(pl.concat([grouped, field]))
+
+        with col2:
+            # create pretty graph
+            fig = bar_chart(grouped, field, column)
             st.plotly_chart(fig, use_container_width=True)
 
-        # second column
-        with col2:
-            column2 = st.selectbox(
-                'Select a column', ['sg_total', 'sg_ott', 'sg_app', 'sg_arg', 'sg_putt', 'round', 'total'],
-                key='distribution')
-            line_break = st.markdown('<br>', unsafe_allow_html=True)
-            probability = st.checkbox('Show probability distribution')
+        
             
-            # pretty chart
-            fig2 = player_stats_histogram(df, column2, probability)
-            st.plotly_chart(fig2, use_container_width=True)
-
-
 
 if __name__ == "__main__":
     app()

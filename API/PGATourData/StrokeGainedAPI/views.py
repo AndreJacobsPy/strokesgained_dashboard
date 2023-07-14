@@ -65,15 +65,35 @@ def get_players_detail(request, name):
         return Response("Player not found")
     
 @api_view(['GET'])
-def get_tournaments_detail(request, name):
+def get_tournaments_detail(request, name=None):
     '''A view to return tournament stats by player'''
-    try:
+    if name:
+        try:
+            # get player name from Players table
+            player = Players.objects.filter(name__icontains=name).values('player_id')
+            stats = Strokesgained.objects.filter(player__in=player)
+            serializer = StrokesgainedSerializer(stats, many=True)
+
+            cols = ['id', 'tournament', 'round', 'name', 'total', 'round_score', 'sg_putt', 'sg_arg', 'sg_app', 'sg_ott', 'sg_t2g', 'sg_total']
+            for i in serializer.data:
+                player_id: int = i['player']
+                name = Players.objects.filter(player_id=player_id).values('name')
+                i['name'] = name[0]['name']
+
+            new_data = []
+            for i in serializer.data:
+                new_data.append(OrderedDict((k, i[k]) for k in cols))
+
+            return Response(new_data)
+    
+        except Players.DoesNotExist:
+            return Response("Player not found")
+        
+    else:
         # get player name from Players table
-        player = Players.objects.filter(name__icontains=name).values('player_id')
-        player_name = Players.objects.filter(name__icontains=name).values('name')
-        stats = Strokesgained.objects.filter(player__in=player)
+        player = Players.objects.all().values('player_id')
+        stats = Strokesgained.objects.all()
         serializer = StrokesgainedSerializer(stats, many=True)
-        player_serializer = PlayersSerializer(player_name, many=True)
 
         cols = ['id', 'tournament', 'round', 'name', 'total', 'round_score', 'sg_putt', 'sg_arg', 'sg_app', 'sg_ott', 'sg_t2g', 'sg_total']
         for i in serializer.data:
@@ -86,6 +106,3 @@ def get_tournaments_detail(request, name):
             new_data.append(OrderedDict((k, i[k]) for k in cols))
 
         return Response(new_data)
-    
-    except Players.DoesNotExist:
-        return Response("Player not found")
