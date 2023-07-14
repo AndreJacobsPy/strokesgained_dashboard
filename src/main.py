@@ -1,12 +1,9 @@
 import streamlit as st
-import sqlalchemy as pgsql
 import numpy as np
 import polars as pl
-import plotly.express as px
 import requests
 import json
 
-from hidden import URL
 from data_view import get_data_api, display_data
 from player_view import polars_barchart_pre, bar_chart
 

@@ -5,31 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 from typing import Tuple
-
-from hidden import URL
     
-
-# @st.cache_data
-# def player_vs_field_barplot(df: pd.DataFrame, player: str, column: str) -> go.Figure:
-#     """
-#     This is a function that will create a bar plot to compare a players statistics
-#     to the rest of the field. The function will take in a dataframe and a player
-#     """
-#     # Create a dataframe for the player and the field
-#     grouped = df.groupby('name').mean().reset_index()
-#     player_df = grouped.query(f'name == "{player}"')
-#     field_df = grouped.query(f'name != "{player}"')
-    
-#     avg_df = pd.DataFrame({'name': ['Field'], column: [field_df[column].mean()]})
-
-#     # some string formatting for pretty title
-#     column_title = column.replace('_', ' ').replace('sg', 'strokes gained').title()
-
-#     # Create a bar plot
-#     fig = px.bar(player_df, x='name', y=column, title=f'{player} vs Field')
-#     fig.add_bar(x=avg_df['name'], y=avg_df[column], name='Field')
-#     fig.update_layout(xaxis_title='Player', yaxis_title=column_title)
-#     return fig
 
 @st.cache_data
 def polars_barchart_pre(df: pd.DataFrame, player: str, column: str) -> Tuple[pl.DataFrame, pl.DataFrame]:
