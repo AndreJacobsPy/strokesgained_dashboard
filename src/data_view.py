@@ -1,23 +1,19 @@
 import streamlit as st
-import sqlalchemy as pgsql
+import polars as pl
 import pandas as pd
+import requests
+import json
 
-from hidden import URL
-
-
-@st.cache_data
-def get_data(table_name: str) -> pd.DataFrame:
-    """A function to get data from the database"""""
-    engine = pgsql.create_engine(URL)
     
-    with engine.connect() as conn:
-        try:
-            # Get data from the database
-            df = pd.read_sql_table(table_name, conn)
-        except:
-            df = pd.DataFrame()
+@st.cache_data
+def get_data_api(table_name: str) -> pl.DataFrame:
+    """A function to get data from the api"""""
+    req = requests.get(f'http://127.0.0.1:8000/api/{table_name}-api')
+    raw_data = req.text
+    json_data = json.loads(raw_data)
 
-        return df
+    df = pl.DataFrame(json_data)
+    return df
     
 
 def display_data(df: pd.DataFrame) -> None:
