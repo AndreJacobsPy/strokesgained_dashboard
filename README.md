@@ -1,4 +1,4 @@
-# PGA Tour Dashboard
+# Strokes Gained Dashboard
 
 ## Technologies Used
 
