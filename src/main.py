@@ -5,7 +5,7 @@ import requests
 import json
 
 from data_view import get_data_api, display_data
-from player_view import polars_barchart_pre, bar_chart
+from player_view import polars_barchart_pre, bar_chart, bar_chart2_prep, bar_chart2
 
 
 def app() -> None:
@@ -72,9 +72,13 @@ def app() -> None:
             st.table(pl.concat([grouped, field]))
 
         with col2:
-            # create pretty graph
+            # create pretty bar chart
             fig = bar_chart(grouped, field, column)
             st.plotly_chart(fig, use_container_width=True)
+
+        # create a second pretty bar chart showing a bit more data
+        fig2 = bar_chart2(*bar_chart2_prep(df, player), player)
+        st.plotly_chart(fig2, use_container_width=True)
 
         
             
