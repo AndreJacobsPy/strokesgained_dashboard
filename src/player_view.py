@@ -4,7 +4,7 @@ import streamlit as st
 import json, requests
 
 
-def barchart_preprocessing(df: pd.DataFrame):
+def preprocessing(df: pd.DataFrame):
     # fixing the dtypes of the strokes gained columns
     sg_cols: list[str] = [i for i in df.columns if "sg" in i]
     for col in sg_cols:
@@ -31,6 +31,6 @@ def load_data() -> pd.DataFrame:
 
 if __name__ == "__main__":
     df: pd.DataFrame = load_data()
-    grouped: pd.DataFrame = barchart_preprocessing(df)
+    grouped: pd.DataFrame = preprocessing(df)
     fig = grouped.iloc[0, :].plot(kind="bar")
     preprocessing_field(grouped)
